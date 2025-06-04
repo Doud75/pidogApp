@@ -1,0 +1,62 @@
+.App {
+  font-family: Arial, sans-serif;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.App-header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.alert-list {
+  list-style: none;
+  padding: 0;
+}
+
+.alert-item {
+  border: 1px solid #ccc;
+  border-left: 5px solid crimson;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert-item.handled {
+  opacity: 0.6;
+  border-left-color: gray;
+}
+
+.alert-info {
+  flex: 1;
+}
+
+.btn-disable {
+  background: crimson;
+  color: white;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-disable:hover {
+  background: darkred;
+}
+
+.label-handled {
+  color: gray;
+  font-style: italic;
+}
+
+.App-footer {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: #666;
+}
