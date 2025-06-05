@@ -44,7 +44,7 @@ export default function App() {
             setSocketConnected(false);
         });
 
-        socketIo.on('intruderDetected', (payload) => {
+        socketIo.on('intrusionAlert', (payload) => {
             setAlerts((prev) => [
                 {
                     id: `${payload.robotId}-${payload.timestamp}`,
