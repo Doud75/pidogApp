@@ -5,8 +5,9 @@ import {
     unregisterUserBySocketId
 } from '../services/deviceRegistryService.js';
 
-import { broadcastIntrusionAlert } from '../services/alertService.js';
-import { sendDisableAlertToRobot } from '../services/robotCommandService.js';
+import { broadcastIntrusionAlert }          from '../services/alertService.js';
+import { sendDisableAlertToRobot }          from '../services/robotCommandService.js';
+import { sendDisableAlertToUsers }          from '../services/userCommandService.js';
 
 export async function socketController(fastify) {
     const io = (await import('../socket.js')).getSocketIOInstance();
@@ -46,10 +47,17 @@ export async function socketController(fastify) {
 
         socket.on('disableAlert', (payload) => {
             try {
-                console.log(`Requête disableAlert de user ${payload.userId} pour robot ${payload.robotId}`);
-                sendDisableAlertToRobot(payload.robotId, {
-                    requestedBy: payload.userId,
-                    timestamp: Date.now()
+                const { userId, robotId } = payload;
+                console.log(`Requête disableAlert de l'utilisateur ${userId} pour le robot ${robotId}`);
+
+                sendDisableAlertToRobot(robotId, {
+                    requestedBy: userId,
+                    timestamp:   Date.now()
+                });
+
+                sendDisableAlertToUsers(robotId, {
+                    requestedBy: userId,
+                    timestamp:   Date.now()
                 });
             } catch (err) {
                 fastify.log.error(`Erreur disableAlert : ${err.message}`);

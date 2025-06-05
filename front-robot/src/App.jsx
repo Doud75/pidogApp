@@ -1,6 +1,6 @@
-import React, {useEffect, useState, useCallback} from 'react';
-import {io} from 'socket.io-client';
-import {v4 as uuidv4} from 'uuid';
+import React, { useEffect, useState, useCallback } from 'react';
+import { io } from 'socket.io-client';
+import { v4 as uuidv4 } from 'uuid';
 import './App.css';
 
 const SOCKET_SERVER_URL = 'http://localhost:4500';
@@ -31,7 +31,7 @@ export default function App() {
 
         socketIo.on('connect', () => {
             setSocketConnected(true);
-            socketIo.emit('register', {type: 'user', id: userId});
+            socketIo.emit('register', { type: 'user', id: userId });
         });
 
         socketIo.on('connect_error', (err) => {
@@ -44,15 +44,27 @@ export default function App() {
             setSocketConnected(false);
         });
 
-        socketIo.on('intrusionAlert', (payload) => {
+        socketIo.on('intruderDetected', (payload) => {
             setAlerts((prev) => [
                 {
                     id: `${payload.robotId}-${payload.timestamp}`,
-                    ...payload,
+                    robotId: payload.robotId,
+                    details: payload.details || {},
+                    timestamp: payload.timestamp,
                     handled: false
                 },
                 ...prev
             ]);
+        });
+
+        socketIo.on('disableAlert', ({ robotId}) => {
+            setAlerts((prev) =>
+                prev.map((a) =>
+                    a.robotId === robotId && !a.handled
+                        ? { ...a, handled: true }
+                        : a
+                )
+            );
         });
 
         setSocket(socketIo);
@@ -65,11 +77,11 @@ export default function App() {
     const handleDisableAlert = useCallback(
         (robotId) => {
             if (!socket || !socketConnected) return;
-            socket.emit('disableAlert', {userId, robotId});
+            socket.emit('disableAlert', { userId, robotId });
             setAlerts((prev) =>
                 prev.map((a) =>
                     a.robotId === robotId && !a.handled
-                        ? {...a, handled: true}
+                        ? { ...a, handled: true }
                         : a
                 )
             );
@@ -81,7 +93,7 @@ export default function App() {
         <div className="App">
             <header className="App-header">
                 <h1>Alertes d’intrusion</h1>
-                <p>Statut : {socketConnected ? 'Connecté' : 'Hors-ligne'}</p>
+                <p>Statut : {socketConnected ? 'Connecté' : 'Hors‐ligne'}</p>
             </header>
 
             <main>
@@ -91,14 +103,11 @@ export default function App() {
                     {alerts.map((alert) => (
                         <li
                             key={alert.id}
-                            className={`alert-item ${
-                                alert.handled ? 'handled' : ''
-                            }`}
+                            className={`alert-item ${alert.handled ? 'handled' : ''}`}
                         >
                             <div className="alert-info">
-                                <strong>Robot :</strong> {alert.robotId} <br/>
-                                <strong>Zone :</strong>{' '}
-                                {alert.details?.zone ?? 'N/A'} <br/>
+                                <strong>Robot :</strong> {alert.robotId} <br />
+                                <strong>Zone :</strong> {alert.details.zone ?? 'N/A'} <br />
                                 <strong>Heure :</strong>{' '}
                                 {new Date(alert.timestamp).toLocaleString()}
                             </div>
@@ -110,9 +119,7 @@ export default function App() {
                                     Désactiver l’alerte
                                 </button>
                             ) : (
-                                <span className="label-handled">
-                  Alerte désactivée
-                </span>
+                                <span className="label-handled">Alerte désactivée</span>
                             )}
                         </li>
                     ))}
