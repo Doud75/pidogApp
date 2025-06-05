@@ -51,7 +51,8 @@ export default function App() {
                     robotId: payload.robotId,
                     details: payload.details || {},
                     timestamp: payload.timestamp,
-                    handled: false
+                    handled: false,
+                    image: payload.image
                 },
                 ...prev
             ]);
@@ -111,6 +112,15 @@ export default function App() {
                                 <strong>Heure :</strong>{' '}
                                 {new Date(alert.timestamp).toLocaleString()}
                             </div>
+                            {alert.image && (
+                                <div className="alert-image-container">
+                                    <img 
+                                        src={`data:image/jpeg;base64,${alert.image}`} 
+                                        alt="Intruder detected" 
+                                        style={{ maxWidth: '100%', height: 'auto', borderRadius: '4px', marginTop: '10px' }} 
+                                    />
+                                </div>
+                            )}
                             {!alert.handled ? (
                                 <button
                                     className="btn-disable"
